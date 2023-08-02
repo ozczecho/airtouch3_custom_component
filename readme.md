@@ -4,7 +4,7 @@ A Home Assistant custom climate component that lets you control your AirTouch 3 
 
 ## Install
 
-I assume you have `vzduch-dotek` up and running. Please refer to that projects documentation on steps to install.
+I assume you have `vzduch-dotek` up and running. Please refer to that projects documentation on steps to install. There is also an [addon](https://github.com/ozczecho/home-assistant-addons) which makes running the api easier.
 
 * Copy the `airtouch3` directory into your `custom_components` folder.
 * This integration uses config flow only, so add the integration using the Home Assistant UI. No need to add anything to your `configuration.yaml`
@@ -64,4 +64,4 @@ A certain level of technical experience is required to get this up and running s
 ## Lovelace
 
 Here is what my setup looks like\
-![AirTouch3 in Lovelave](https://github.com/ozczecho/airtouch3_custom_component/blob/main/at3.PNG?raw=true)
+![AirTouch3 in Lovelave](https://github.com/ozczecho/airtouch3_custom_component/blob/master/at3.PNG?raw=true)
