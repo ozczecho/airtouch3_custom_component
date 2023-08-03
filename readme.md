@@ -2,6 +2,11 @@
 
 A Home Assistant custom climate component that lets you control your AirTouch 3 console locally. It has a dependancy on the [vzduch-dotek](https://github.com/ozczecho/vzduch-dotek) api.
 
+## Update for Home Assistant 2023.8
+
+* Device info was being set incorrectly for switch and fan
+* Device info was being set without identifiers for Climate entity
+
 ## Install
 
 I assume you have `vzduch-dotek` up and running. Please refer to that projects documentation on steps to install. There is also an [addon](https://github.com/ozczecho/home-assistant-addons) which makes running the api easier.

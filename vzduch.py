@@ -8,6 +8,10 @@ from datetime import timedelta
 from aiohttp import ClientSession, ServerDisconnectedError
 from homeassistant.util import Throttle
 
+from .const import (
+    DOMAIN
+)
+
 _LOGGER = logging.getLogger(__name__)
 MIN_TIME_BETWEEN_UPDATES = timedelta(seconds=60)
 
@@ -189,7 +193,8 @@ class Vzduch:
         return {
             "manufacturer": "Polyaire",
             "model": "AirTouch 3",
-            "name": self._name
+            "name": self._name,
+            "identifiers": {(DOMAIN, self._airtouch_id)}
         }
 
     @property

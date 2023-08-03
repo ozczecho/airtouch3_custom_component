@@ -44,15 +44,15 @@ class ZoneSwitch(ToggleEntity):
     @property
     def unique_id(self):
         """Return a unique ID."""
-        return f"{self._api.airtouch_id}-{self._zone.id}"
+        return f"{self._api.airtouch_id}-{self._zone.id}-switch"
 
-    @property
-    def device_info(self):
-        """Return a device description for device registry."""
-        return {
-            "zone name": self._zone.name,
-            "id": self._zone.id
-        }
+    # @property
+    # def device_info(self):
+    #     """Return a device description for device registry."""
+    #     return {
+    #         "zone name": self._zone.name,
+    #         "id": self._zone.id
+    #     }
 
     @property
     def name(self):
