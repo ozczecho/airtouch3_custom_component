@@ -8,7 +8,7 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_TYPE,
     CONF_UNIT_OF_MEASUREMENT,
-    TEMP_CELSIUS
+    UnitOfTemperature
 )
 from homeassistant.helpers.entity import Entity
 
@@ -81,7 +81,7 @@ class AT3Sensor(Entity):
     @property
     def unit_of_measurement(self):
         """Return the unit of measurement."""
-        return TEMP_CELSIUS
+        return UnitOfTemperature.CELSIUS
 
     @property
     def device_class(self):

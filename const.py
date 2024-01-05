@@ -5,8 +5,8 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_TYPE,
     CONF_UNIT_OF_MEASUREMENT,
-    TEMP_CELSIUS,
     PERCENTAGE,
+    UnitOfTemperature
 )
 
 DEFAULT_PORT = 8899

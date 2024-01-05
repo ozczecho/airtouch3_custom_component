@@ -1,7 +1,7 @@
 """Support for AirTouch3 zone Dampers."""
 import logging
 
-from homeassistant.components.fan import (FanEntity, SUPPORT_SET_SPEED)
+from homeassistant.components.fan import (FanEntity, FanEntityFeature)
  
 
 from homeassistant.helpers.entity import ToggleEntity
@@ -11,7 +11,7 @@ from homeassistant.util.percentage import int_states_in_range, ranged_value_to_p
 SPEED_RANGE = (1, 100)
 
 SUPPORTED_FEATURES = \
-    SUPPORT_SET_SPEED
+    FanEntityFeature.SET_SPEED
 
 from . import DOMAIN as AT3_DOMAIN
 

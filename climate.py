@@ -7,21 +7,11 @@ from homeassistant.components.climate import PLATFORM_SCHEMA, ClimateEntity
 from homeassistant.components.climate.const import (
     ATTR_FAN_MODE,
     ATTR_HVAC_MODE,
-    HVAC_MODE_COOL,
-    HVAC_MODE_DRY,
-    HVAC_MODE_FAN_ONLY,
-    HVAC_MODE_HEAT,
-    HVAC_MODE_HEAT_COOL,
-    HVAC_MODE_OFF,
-    CURRENT_HVAC_OFF,
-    CURRENT_HVAC_HEAT,
-    CURRENT_HVAC_COOL,
-    CURRENT_HVAC_DRY,
-    CURRENT_HVAC_IDLE,
-    SUPPORT_FAN_MODE,
-    SUPPORT_TARGET_TEMPERATURE,
+    HVACMode,
+    HVACAction,
+    ClimateEntityFeature,
 )
-from homeassistant.const import ATTR_TEMPERATURE, CONF_HOST, CONF_NAME, TEMP_CELSIUS
+from homeassistant.const import ATTR_TEMPERATURE, CONF_HOST, CONF_NAME, UnitOfTemperature
 import homeassistant.helpers.config_validation as cv
 
 from custom_components.airtouch3.vzduch import (
@@ -54,30 +44,30 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 HA_STATE_TO_AT3 = {
-    HVAC_MODE_OFF :-1,
-    HVAC_MODE_HEAT: AC_MODE_HEAT,
-    HVAC_MODE_COOL: AC_MODE_COOL,
-    HVAC_MODE_FAN_ONLY: AC_MODE_FAN,
-    HVAC_MODE_DRY: AC_MODE_DRY,
-    HVAC_MODE_HEAT_COOL: AC_MODE_AUTO,
+    HVACMode.OFF :-1,
+    HVACMode.HEAT: AC_MODE_HEAT,
+    HVACMode.COOL: AC_MODE_COOL,
+    HVACMode.FAN_ONLY: AC_MODE_FAN,
+    HVACMode.DRY: AC_MODE_DRY,
+    HVACMode.HEAT_COOL: AC_MODE_AUTO,
 }
 
 AT3_TO_HA_STATE = {
-   -1: HVAC_MODE_OFF,
-    AC_MODE_HEAT: HVAC_MODE_HEAT,
-    AC_MODE_COOL: HVAC_MODE_COOL,
-    AC_MODE_FAN: HVAC_MODE_FAN_ONLY,
-    AC_MODE_DRY: HVAC_MODE_DRY,
-    AC_MODE_AUTO: HVAC_MODE_HEAT_COOL
+   -1: HVACMode.OFF,
+    AC_MODE_HEAT: HVACMode.HEAT,
+    AC_MODE_COOL: HVACMode.COOL,
+    AC_MODE_FAN: HVACMode.FAN_ONLY,
+    AC_MODE_DRY: HVACMode.DRY,
+    AC_MODE_AUTO: HVACMode.HEAT_COOL
 }
 
 HA_STATE_TO_CURRENT_STATE = {
-    HVAC_MODE_OFF : CURRENT_HVAC_OFF,
-    HVAC_MODE_HEAT: CURRENT_HVAC_HEAT,
-    HVAC_MODE_COOL: CURRENT_HVAC_COOL,
-    HVAC_MODE_FAN_ONLY: CURRENT_HVAC_IDLE,
-    HVAC_MODE_DRY: CURRENT_HVAC_DRY,
-    HVAC_MODE_HEAT_COOL: CURRENT_HVAC_IDLE
+    HVACMode.OFF : HVACAction.OFF,
+    HVACMode.HEAT: HVACAction.HEATING,
+    HVACMode.COOL: HVACAction.COOLING,
+    HVACMode.FAN_ONLY: HVACAction.IDLE,
+    HVACMode.DRY: HVACAction.DRYING,
+    HVACMode.HEAT_COOL: HVACAction.IDLE
 }
 
 HA_FAN_MODE_TO_AT3 = {
@@ -102,8 +92,8 @@ TEMPERATURE_PRECISION = 1
 TARGET_TEMPERATURE_STEP = 1
 
 SUPPORTED_FEATURES = \
-    SUPPORT_TARGET_TEMPERATURE | \
-    SUPPORT_FAN_MODE 
+    ClimateEntityFeature.TARGET_TEMPERATURE | \
+    ClimateEntityFeature.FAN_MODE 
 
 CLIMATE_ICON = "mdi:home-variant-outline"
 
@@ -203,7 +193,7 @@ class AirTouch3Climate(ClimateEntity):
     @property
     def temperature_unit(self):
         """Return the unit of measurement which this thermostat uses."""
-        return TEMP_CELSIUS
+        return UnitOfTemperature.CELSIUS
 
     @property
     def precision(self):
@@ -229,16 +219,16 @@ class AirTouch3Climate(ClimateEntity):
     def hvac_action(self):
         """The current HVAC action (heating, cooling)"""
         if self._api.power == AC_POWER_OFF:
-            return CURRENT_HVAC_OFF
+            return HVACAction.OFF
             
         ac_mode = self._api.mode
-        return HA_STATE_TO_CURRENT_STATE.get(AT3_TO_HA_STATE.get(ac_mode, HVAC_MODE_HEAT_COOL), CURRENT_HVAC_IDLE)
+        return HA_STATE_TO_CURRENT_STATE.get(AT3_TO_HA_STATE.get(ac_mode, HVACMode.HEAT_COOL), HVACAction.IDLE)
 
     @property
     def hvac_mode(self):
         """Return current operation ie. heat, cool, idle. Used to determine state."""
         ac_mode = self._api.mode
-        return AT3_TO_HA_STATE.get(ac_mode, HVAC_MODE_HEAT_COOL)
+        return AT3_TO_HA_STATE.get(ac_mode, HVACMode.HEAT_COOL)
 
     @property
     def hvac_modes(self):
@@ -258,7 +248,7 @@ class AirTouch3Climate(ClimateEntity):
 
     async def async_set_hvac_mode(self, hvac_mode):
         """Set HVAC mode."""
-        if hvac_mode == HVAC_MODE_OFF:
+        if hvac_mode == HVACMode.OFF:
             _LOGGER.debug("[AT3Climate] async_set_hvac_mode Turning AC OFF")
             await self._api.power_switch(AC_POWER_OFF)
         else:

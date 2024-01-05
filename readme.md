@@ -1,6 +1,10 @@
-# AirTouch 3 Integration (Last update: Aug 2023)
+# AirTouch 3 Integration (Last update: Jan 2024)
 
 A Home Assistant custom climate component that lets you control your AirTouch 3 console locally. It has a dependancy on the [vzduch-dotek](https://github.com/ozczecho/vzduch-dotek) api.
+
+## Update for Home Assistant 2024.1
+
+* Update constants shared with Home Assistant to maintain compatibility
 
 ## Update for Home Assistant 2023.8
 
