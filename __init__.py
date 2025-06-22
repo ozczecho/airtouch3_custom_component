@@ -3,6 +3,7 @@ import asyncio
 from datetime import timedelta
 import logging
 
+from aiohttp import ClientConnectionError
 from async_timeout import timeout
 from custom_components.airtouch3.vzduch import Vzduch
 import voluptuous as vol
@@ -12,7 +13,8 @@ from homeassistant.const import CONF_HOST, CONF_PORT, CONF_TIMEOUT
 from .const import DOMAIN, TIMEOUT
 from homeassistant.exceptions import ConfigEntryNotReady
 import homeassistant.helpers.config_validation as cv
-from homeassistant.helpers.typing import HomeAssistantType
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.util import Throttle
 
 from . import config_flow  # noqa: F401
@@ -41,7 +43,7 @@ async def async_setup(hass, config):
     )
     return True
 
-async def async_setup_entry(hass: HomeAssistantType, entry: ConfigEntry):
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Connect to Airtouch3 Unit"""
     conf = entry.data
 
@@ -53,20 +55,12 @@ async def async_setup_entry(hass: HomeAssistantType, entry: ConfigEntry):
     if not vzduch_api:
         return False
     hass.data.setdefault(DOMAIN, {}).update({entry.entry_id: vzduch_api})
-    for component in COMPONENT_TYPES:
-        hass.async_create_task(
-            hass.config_entries.async_forward_entry_setup(entry, component)
-        )
+    await hass.config_entries.async_forward_entry_setups(entry, COMPONENT_TYPES)
     return True
 
 async def async_unload_entry(hass, config_entry):
     """Unload a config entry."""
-    await asyncio.wait(
-        [
-            hass.config_entries.async_forward_entry_unload(config_entry, component)
-            for component in COMPONENT_TYPES
-        ]
-    )
+    await hass.config_entries.async_unload_platforms(config_entry, COMPONENT_TYPES)
     hass.data[DOMAIN].pop(config_entry.entry_id)
     if not hass.data[DOMAIN]:
         hass.data.pop(DOMAIN)
@@ -75,7 +69,7 @@ async def async_unload_entry(hass, config_entry):
 async def api_init(hass, host, port, timeout = TIMEOUT):
     """Init the Airtouch unit."""
 
-    session = hass.helpers.aiohttp_client.async_get_clientsession()
+    session = async_get_clientsession(hass)
     try:
         _LOGGER.debug(f"We have host {host} port {port}")
         device = Vzduch(session, host, port, timeout)

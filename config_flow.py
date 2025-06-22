@@ -2,10 +2,13 @@ import asyncio
 import logging
 import voluptuous as vol
 
+from aiohttp import web_exceptions, ClientError
 from async_timeout import timeout
 from custom_components.airtouch3.vzduch import Vzduch
 
-from homeassistant import config_entries, core
+from homeassistant import config_entries
+from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.const import CONF_HOST, CONF_PORT
 
 from . import config_flow
@@ -20,7 +23,7 @@ class AirTouch3ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
     CONNECTION_CLASS = config_entries.CONN_CLASS_LOCAL_POLL
 
-    @core.callback
+    @callback
     def _async_get_entry(self, data):
 
         return self.async_create_entry(
@@ -42,7 +45,7 @@ class AirTouch3ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         try:
             _LOGGER.debug("create_device")
-            session = self.hass.helpers.aiohttp_client.async_get_clientsession()
+            session = async_get_clientsession(self.hass)
             with timeout(TIMEOUT):
                 _LOGGER.debug("Call vzduch")
                 device = Vzduch(session, host, port, timeout)
@@ -76,7 +79,7 @@ class AirTouch3ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def create_device(self, host, port=DEFAULT_PORT):
         try:
             _LOGGER.debug("create_device")
-            session = self.hass.helpers.aiohttp_client.async_get_clientsession()
+            session = async_get_clientsession(self.hass)
             with timeout(TIMEOUT):
                 _LOGGER.debug("Call vzduch")
                 device = await Vzduch(session, host, port, timeout)
